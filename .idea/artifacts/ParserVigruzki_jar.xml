@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ParserVigruzki:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ParserVigruzki_jar</output-path>
+    <root id="archive" name="ParserVigruzki.jar">
+      <element id="module-output" name="ParserVigruzki" />
+    </root>
+  </artifact>
+</component>
