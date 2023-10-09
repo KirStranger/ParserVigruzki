@@ -6,7 +6,12 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class WriteToFile {
+    private static int correctCounter;
+    private static int incorrectCounter;
+
     public static void CreateTxtFiles(File sourseFile, Parser parser) {
+        correctCounter = 0;
+        incorrectCounter = 0;
         File destinationFile = new File(sourseFile.getParent(), sourseFile.getName() + ".txt");
         File errorLinesFile = new File(sourseFile.getParent(), "Строки с ошибками.txt");
 
@@ -15,9 +20,11 @@ public class WriteToFile {
             for (int i = 0;i < listString.size(); i++){
                 if(isCorrect(listString.get(i))){
                     correctLineWriter.println(listString.get(i).getDate() + ";" + listString.get(i).getAmount() + ";" + listString.get(i).getID());
+                    correctCounter++;
                 }
                 else{
                     errorLineWriter.println(parser.getStartRow() + i + 1);
+                    incorrectCounter++;
                 }
             }
         } catch (FileNotFoundException e) {
@@ -42,6 +49,14 @@ public class WriteToFile {
         }
 
         return result;
+    }
+
+    public static int getCorrectCounter() {
+        return correctCounter;
+    }
+
+    public static int getIncorrectCounter() {
+        return incorrectCounter;
     }
 
 }

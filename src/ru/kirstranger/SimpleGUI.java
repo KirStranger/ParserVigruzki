@@ -18,10 +18,8 @@ public class SimpleGUI extends JFrame {
     JFormattedTextField jNumberCellAmount;
     JFormattedTextField jNumberCellID;
     File exelFile;
-    public void showView(){
 
-        initView();
-
+    public void showView() {
         jButtonSelect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -29,7 +27,7 @@ public class SimpleGUI extends JFrame {
                 fileChooser.setFileFilter(new FileFilter() {
                     @Override
                     public boolean accept(File f) {
-                        if(f.getName().endsWith("xlsx")){
+                        if (f.getName().endsWith("xlsx") || f.isDirectory()) {
                             return true;
                         }
                         return false;
@@ -48,24 +46,26 @@ public class SimpleGUI extends JFrame {
         jButtonStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Parser parser = new Parser(Integer.parseInt(jStartRow.getText()),
-                        Integer.parseInt(jNumberCellDate.getText()),
-                        Integer.parseInt(jNumberCellAmount.getText()),
-                        Integer.parseInt(jNumberCellID.getText()));
-                WriteToFile.CreateTxtFiles(exelFile, parser);
-                ArrayList<SingleString> listString = parser.getStrings(exelFile);
-                for (int i = 0; i< listString.size(); i++){
-                    System.out.println( i+17 + " " +listString.get(i).getDate() + " " + listString.get(i).getAmount() + " " + listString.get(i).getID());
+                if (exelFile == null) {
+                    JOptionPane.showMessageDialog(null, "Не указан путь к файлу", "Ошибка", JOptionPane.PLAIN_MESSAGE);
+                } else {
+                    Parser parser = new Parser(Integer.parseInt(jStartRow.getText()),
+                            Integer.parseInt(jNumberCellDate.getText()),
+                            Integer.parseInt(jNumberCellAmount.getText()),
+                            Integer.parseInt(jNumberCellID.getText()));
+                    WriteToFile.CreateTxtFiles(exelFile, parser);
+                    JOptionPane.showMessageDialog(null, "Было создано записей: " + WriteToFile.getCorrectCounter() +
+                            "\n" + "Проблемных строк: " + WriteToFile.getIncorrectCounter(), "Готово", JOptionPane.PLAIN_MESSAGE);
                 }
             }
         });
-
         jPanel.revalidate();
     }
 
-    private void initView() {
+    public SimpleGUI() throws HeadlessException {
+        super("Из exel в txt");
         jFrame.add(jPanel);
-        jPanel.setLayout(new GridLayout(5,3,2,2));
+        jPanel.setLayout(new GridLayout(5, 3, 2, 2));
         jButtonSelect = new JButton("Выбрать файл");
         jButtonStart = new JButton("Начать обработку");
 
@@ -80,7 +80,7 @@ public class SimpleGUI extends JFrame {
         JLabel jLabelCellID = new JLabel("Колонка ЛС");
 
         jStartRow.setValue(17);
-        jNumberCellDate.setValue(2);
+        jNumberCellDate.setValue(3);
         jNumberCellAmount.setValue(13);
         jNumberCellID.setValue(22);
 
@@ -96,11 +96,13 @@ public class SimpleGUI extends JFrame {
         jPanel.add(jLabelCellID);
     }
 
-    static JFrame getFrame(){
+    static JFrame getFrame() {
 
-        JFrame jFrame = new JFrame(){};
+        JFrame jFrame = new JFrame() {
+        };
+        jFrame.setBackground(Color.BLACK);
         jFrame.setVisible(true);
-        jFrame.setBounds(500,250,300,200);
+        jFrame.setBounds(500, 250, 300, 200);
         jFrame.setDefaultCloseOperation(jFrame.EXIT_ON_CLOSE);
         return jFrame;
     }
