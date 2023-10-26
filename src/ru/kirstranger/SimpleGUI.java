@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
@@ -49,17 +48,33 @@ public class SimpleGUI extends JFrame {
                 if (exelFile == null) {
                     JOptionPane.showMessageDialog(null, "Не указан путь к файлу", "Ошибка", JOptionPane.PLAIN_MESSAGE);
                 } else {
-                    Parser parser = new Parser(Integer.parseInt(jStartRow.getText()),
-                            Integer.parseInt(jNumberCellDate.getText()),
-                            Integer.parseInt(jNumberCellAmount.getText()),
-                            Integer.parseInt(jNumberCellID.getText()));
-                    WriteToFile.CreateTxtFiles(exelFile, parser);
-                    JOptionPane.showMessageDialog(null, "Было создано записей: " + WriteToFile.getCorrectCounter() +
-                            "\n" + "Проблемных строк: " + WriteToFile.getIncorrectCounter(), "Готово", JOptionPane.PLAIN_MESSAGE);
+
+                    int startRow = Integer.parseInt(jStartRow.getText());
+                    int numberCellDate = jNumberCellDate.getText().toLowerCase().charAt(0) - 96;
+                    int numberCellAmount = jNumberCellAmount.getText().toLowerCase().charAt(0) - 96;
+                    int numberCellID = jNumberCellID.getText().toLowerCase().charAt(0) - 96;
+                    if (isCorrect(numberCellDate, numberCellAmount, numberCellID)) {
+                        Parser parser = new Parser(startRow, numberCellDate, numberCellAmount, numberCellID);
+                        WriteToFile.CreateTxtFiles(exelFile, parser);
+                        JOptionPane.showMessageDialog(null, "Было создано записей: " + WriteToFile.getCorrectCounter() +
+                                "\n" + "Проблемных строк: " + WriteToFile.getIncorrectCounter(), "Готово", JOptionPane.PLAIN_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Неправильно указана информация о колонках, \n проверьте раскладку клавиотуры  ", "Ошибка", JOptionPane.PLAIN_MESSAGE);
+                    }
                 }
             }
         });
         jPanel.revalidate();
+    }
+
+    private boolean isCorrect(int numberCellDate, int numberCellAmount, int numberCellID) {
+        boolean result = true;
+        int min = 1;
+        int max = 26;
+        if (numberCellDate < min || numberCellDate > max || numberCellAmount < min || numberCellAmount > max || numberCellID < min || numberCellID > max) {
+            result = false;
+        }
+        return result;
     }
 
     public SimpleGUI() throws HeadlessException {
@@ -70,9 +85,9 @@ public class SimpleGUI extends JFrame {
         jButtonStart = new JButton("Начать обработку");
 
         jStartRow = new JFormattedTextField(NumberFormat.getIntegerInstance());
-        jNumberCellDate = new JFormattedTextField(NumberFormat.getIntegerInstance());
-        jNumberCellAmount = new JFormattedTextField(NumberFormat.getIntegerInstance());
-        jNumberCellID = new JFormattedTextField(NumberFormat.getIntegerInstance());
+        jNumberCellDate = new JFormattedTextField();
+        jNumberCellAmount = new JFormattedTextField();
+        jNumberCellID = new JFormattedTextField();
 
         JLabel jLabelStarRow = new JLabel("Стартовая строка");
         JLabel jLabelCellDate = new JLabel("Колонка даты");
@@ -80,9 +95,9 @@ public class SimpleGUI extends JFrame {
         JLabel jLabelCellID = new JLabel("Колонка ЛС");
 
         jStartRow.setValue(17);
-        jNumberCellDate.setValue(3);
-        jNumberCellAmount.setValue(13);
-        jNumberCellID.setValue(22);
+        jNumberCellDate.setValue("B");
+        jNumberCellAmount.setValue("N");
+        jNumberCellID.setValue("U");
 
         jPanel.add(jButtonSelect);
         jPanel.add(jButtonStart);

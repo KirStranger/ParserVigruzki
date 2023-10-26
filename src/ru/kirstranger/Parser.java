@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.regex.Matcher;
@@ -50,17 +51,51 @@ public class Parser {
 
     private String parseID(Row row) {
         String ID = "";
-        Pattern pattern = Pattern.compile("\\d{10}");
-        String str = row.getCell(numberCellID).getStringCellValue();
-        Matcher matcher = pattern.matcher(str);
-        if (matcher.find()) {
-            ID += matcher.group();
+        String str;
+
+        Pattern patternIncorrect = Pattern.compile("\\d{11}");
+        str = row.getCell(numberCellID).getStringCellValue();
+        Matcher matcherIncorrect = patternIncorrect.matcher(str);
+        if (matcherIncorrect.find()) {
+            ID += "0";
         }
+
+        if (!ID.equals("0")) {
+            Pattern pattern = Pattern.compile("\\d{10}");
+            str = row.getCell(numberCellID).getStringCellValue();
+
+            Matcher matcher = pattern.matcher(str);
+            if (matcher.find()) {
+                ID += matcher.group();
+            }
+        }
+
         return ID;
     }
 
     private double parseAmount(Row row) {
-        double amount = row.getCell(numberCellAmount).getNumericCellValue();
+         double amount = 0;
+         CellType cellType =  row.getCell(numberCellAmount).getCellType();
+        System.out.println("Получаем сумму");
+         if (cellType == CellType.NUMERIC)
+         {
+             amount = row.getCell(numberCellAmount).getNumericCellValue();
+         } else if (cellType == CellType.STRING) {
+             System.out.println("не число");
+             System.out.println(row.getCell(numberCellAmount).getStringCellValue());
+             if (!row.getCell(numberCellAmount).getStringCellValue().isEmpty())
+             {
+
+                amount = Double.parseDouble(row.getCell(numberCellAmount).getStringCellValue());
+             } else  {
+                 System.out.println();
+                 System.out.println();
+                 System.out.println();
+                 System.out.println("Пустой");
+             }
+             System.out.println(" сумма" + amount);
+         }else
+
         if (amount == 0) {
             // Вывести ошибку что сумма не заполнена
         }
@@ -68,9 +103,13 @@ public class Parser {
     }
 
     private String parseDate(Row row) {
-        String date = row.getCell(numberCellDate).getStringCellValue().trim();
-        if (date.isEmpty()) {
-            // Вывести сообщение о незаполненой дате в строке №
+        String date = "";
+        CellType cellType = row.getCell(numberCellDate).getCellType();
+        if (cellType == CellType.STRING) {
+            date = row.getCell(numberCellDate).getStringCellValue().trim();
+        } else if (cellType == CellType.NUMERIC) {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM.dd.yyyy");
+            date = "" + row.getCell(numberCellDate).getLocalDateTimeCellValue().format(dtf);
         }
         return date;
     }
